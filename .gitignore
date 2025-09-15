@@ -1,0 +1,21 @@
+# Data and Output
+/data/
+/output/
+
+# Environment
+/dlvr-project/
+/env/
+/.env
+
+# Python Caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# IDE / Editor specific
+.vscode/
+.idea/
