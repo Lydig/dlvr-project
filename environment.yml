@@ -1,16 +1,20 @@
 name: dlvr-project
 channels:
-  - defaults
+  - pytorch
   - conda-forge
+  - defaults
 dependencies:
-  - python=3.8
-  - tensorflow
-  - keras
+  - python=3.9
+  - pytorch
+  - torchvision
+  - torchaudio
+  - simpleitk
   - numpy
-  - pillow
+  - scipy
   - matplotlib
-  - opencv
   - jupyter
+  - pandas
+  - ipykernel
   - pip
   - pip:
-    - youtube_dl
+    - nibabel

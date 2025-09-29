@@ -1,56 +1,121 @@
-# Deep Learning for Visual Recognition: Project
+# Pelvic MRI Segmentation in Endometriosis Project
 
-This repository contains the project for the Aarhus University course "Deep Learning for Visual Recognition".
+This is the group project repository for the *Deep Learning for Visual Recognition* course at Aarhus University.  
+The project focuses on applying U-Net variants to segment pelvic organs in MRI scans of patients with endometriosis.
 
-## Project Goal
-
-The goal of this project is to analyze and improve a YOLOv2-based object detection model for identifying champion icons on the League of Legends minimap. We will be using the "DeepLeague" dataset and codebase as our foundation. Our work will focus on reproducing the original results and then conducting experiments to improve model performance through techniques such as data augmentation and class imbalance analysis.
+---
 
 ## Setup Instructions
 
-This project uses Conda for environment management to ensure reproducibility.
+Follow these steps to set up the project environment and download the necessary data.
 
-1.  **Clone the repository:**
-    ```bash
-    git clone <your-repo-url>
-    cd dlvr-project
-    ```
+### 1. Prerequisites
 
-2.  **Create the Conda Environment:**
-    Navigate to the project's root directory and run the following command. This will create a new Conda environment named `dlvr-project` with all the necessary packages defined in `environment.yml`.
-    ```bash
-    conda env create -f environment.yml
-    ```
+Ensure you have the following software installed on your system:
 
-3.  **Activate the Environment:**
-    Before running any scripts or notebooks, you must activate the environment:
-    ```bash
-    conda activate dlvr-project
-    ```
+- **Git** – For version control. [Download here](https://git-scm.com/downloads).  
+- **Miniconda/Anaconda** – For managing the Python environment. [Download Miniconda here](https://docs.conda.io/en/latest/miniconda.html).
 
-## Data Acquisition
+---
 
-The dataset is not included in this repository. It must be downloaded separately.
+### 2. Clone the Repository
 
-1.  **Download the Dataset:**
-    The DeepLeague dataset can be downloaded from [this link on archive.org](https://archive.org/compress/DeepLeague100K). It is a large (approx. 30GB) compressed file. We recommend using a download manager or `wget` if you are on Linux/macOS.
-
-2.  **Extract the Data:**
-    Once downloaded, extract the contents into the `data/` folder in the project's root directory. The final structure should look something like this:
-    ```
-    dlvr-project/
-    ├── data/
-    │   ├── clusters_cleaned/
-    │   │   ├── test/
-    │   │   ├── train/
-    │   │   └── val/
-    ...
-    ```
-
-## Usage
-
-All analysis and experimentation will be conducted in Jupyter Notebooks located in the `/notebooks` directory. To start, launch Jupyter Lab from the project's root directory:
+Open your terminal or command prompt and clone the repository:
 
 ```bash
-jupyter lab
+git clone <your-repository-url>
+cd dlvr-project
 ```
+
+---
+
+### 3. Create and Activate the Conda Environment
+
+This project uses a specific set of Python packages defined in `environment.yml`.
+
+Create the environment:
+
+```bash
+conda env create -f environment.yml
+```
+
+Activate the environment:
+
+```bash
+conda activate dlvr-project
+```
+
+---
+
+### 4. Download and Prepare the Dataset
+
+The dataset (~8 GB) is **not** tracked by Git (see `.gitignore`).
+
+1. Create a `data` directory (if it doesn’t exist):
+
+   ```bash
+   mkdir data
+   ```
+
+2. Download the dataset manually from [Zenodo](https://zenodo.org/records/15750762)  
+   or use PowerShell:
+
+   ```powershell
+   Invoke-WebRequest -Uri "https://zenodo.org/records/15750762/files/UT-EndoMRI.zip?download=1" -OutFile "data/UT-EndoMRI.zip"
+   ```
+
+3. Unzip `UT-EndoMRI.zip` into the `data` directory.  
+   Final structure should look like:
+
+   ```
+   dlvr-project/
+   └── data/
+       └── UT-EndoMRI/
+   ```
+
+---
+
+### 5. Configure VS Code for Jupyter Notebooks
+
+To use Jupyter notebooks in VS Code with this environment, register it as a kernel:
+
+```bash
+python -m ipykernel install --user --name=dlvr-project
+```
+
+**Important:** After running this, restart VS Code.
+
+---
+
+## How to Run
+
+1. Activate the environment:
+
+   ```bash
+   conda activate dlvr-project
+   ```
+
+2. Open the project in VS Code:
+
+   ```bash
+   code .
+   ```
+
+3. Open a notebook from the `notebooks/` directory (e.g., `notebooks/01_initial_data_exploration.ipynb`).  
+   When prompted, select the `dlvr-project` kernel. You can now run the cells.
+
+---
+
+## Project Structure
+
+```
+dlvr-project/
+├── data/          # Contains the dataset (ignored by Git)
+├── notebooks/     # Experimental/exploratory code (chronological naming: 01_..., 02_...)
+├── src/           # Reusable, polished Python scripts and functions
+├── material/      # Research papers, lecture notes, references
+├── environment.yml # Conda environment specification
+└── README.md      # This file
+```
+
+---
