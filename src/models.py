@@ -89,22 +89,31 @@ class AttentionUNet(nn.Module):
         self.outc = nn.Conv2d(64, n_classes, kernel_size=1)
 
     def forward(self, x):
-        s1 = self.inc(x); s2 = self.down1(s1); s3 = self.down2(s2); s4 = self.down3(s3); s5 = self.down4(s4)
+        s1 = self.inc(x)
+        s2 = self.down1(s1)
+        s3 = self.down2(s2)
+        s4 = self.down3(s3)
+        s5 = self.down4(s4)
         
+        # Decoder with attention gates
         d4 = self.up1(s5)
-        s4 = self.att1(g=d4, x=s4)
-        d4 = self.conv1(torch.cat([d4, s4], dim=1))
+        s4_att = self.att1(g=d4, x=s4)
+        d4_cat = torch.cat([d4, s4_att], dim=1)
+        d4 = self.conv1(d4_cat)
 
         d3 = self.up2(d4)
-        s3 = self.att2(g=d3, x=s3)
-        d3 = self.conv2(torch.cat([d3, s3], dim=1))
+        s3_att = self.att2(g=d3, x=s3)
+        d3_cat = torch.cat([d3, s3_att], dim=1)
+        d3 = self.conv2(d3_cat)
 
         d2 = self.up3(d3)
-        s2 = self.att3(g=d2, x=s2)
-        d2 = self.conv3(torch.cat([d2, s2], dim=1))
+        s2_att = self.att3(g=d2, x=s2)
+        d2_cat = torch.cat([d2, s2_att], dim=1)
+        d2 = self.conv3(d2_cat)
 
         d1 = self.up4(d2)
-        s1 = self.att4(g=d1, x=s1)
-        d1 = self.conv4(torch.cat([d1, s1], dim=1))
+        s1_att = self.att4(g=d1, x=s1)
+        d1_cat = torch.cat([d1, s1_att], dim=1)
+        d1 = self.conv4(d1_cat)
         
         return self.outc(d1)
