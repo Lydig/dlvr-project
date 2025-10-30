@@ -181,3 +181,123 @@ class UterusDatasetWithPreprocessing(Dataset):
         # so we don't need to do it here again.
             
         return image_tensor, mask_tensor
+
+# (Keep the other two Dataset classes in the file)
+
+import random
+
+# --- New Class for Step 3: Slice Classification (CORRECTED) ---
+class SliceClassifierDataset(Dataset):
+    """
+    PyTorch Dataset for the slice classification task (ResClass).
+    Loads ALL slices from a 3D MRI and assigns a binary label:
+    1 if the slice contains an ovary, 0 otherwise.
+    Applies RAovSeg preprocessing and handles class imbalance via subsampling.
+    """
+    def __init__(self, manifest_path, image_size=256, augment=False, negative_to_positive_ratio=2.0):
+        self.manifest = pd.read_csv(manifest_path)
+        self.image_size = image_size
+        self.augment = augment
+        self.slice_data = []
+
+        # Transforms
+        self.image_transform = T.Resize((image_size, image_size), interpolation=T.InterpolationMode.BICUBIC, antialias=True)
+        if self.augment:
+            self.augmentation_transform = T.Compose([
+                T.RandomAffine(degrees=15, translate=(0.05, 0.05)),
+                T.RandomHorizontalFlip(p=0.5),
+            ])
+        
+        print(f"Loading manifest from {manifest_path} and creating slice map for classifier...")
+        
+        positive_samples = []
+        negative_samples = []
+
+        for patient_index, row in self.manifest.iterrows():
+            if pd.notna(row['mri_path']) and os.path.exists(row['mri_path']):
+                mri_image = sitk.ReadImage(row['mri_path'], sitk.sitkFloat32)
+                mri_array = sitk.GetArrayFromImage(mri_image)
+                num_slices = mri_array.shape[0]
+
+                mask_array = None
+                if pd.notna(row['mask_path']) and os.path.exists(row['mask_path']):
+                    mask_image = sitk.ReadImage(row['mask_path'], sitk.sitkUInt8)
+                    mask_array = sitk.GetArrayFromImage(mask_image)
+
+                for slice_index in range(num_slices):
+                    sample_info = {'mri_path': row['mri_path'], 'slice_index': slice_index}
+
+                    # Default to negative
+                    label = 0
+                    # Only index the mask if it exists AND this slice index is within the mask depth
+                    if mask_array is not None and slice_index < mask_array.shape[0]:
+                        if np.sum(mask_array[slice_index]) > 0:
+                            label = 1
+
+                    if label == 1:
+                        positive_samples.append({**sample_info, 'label': 1})
+                    else:
+                        negative_samples.append({**sample_info, 'label': 0})
+
+        
+        # Handle class imbalance by subsampling the negative class
+        num_positive = len(positive_samples)
+        num_negative_to_keep = int(num_positive * negative_to_positive_ratio)
+        
+        if len(negative_samples) > num_negative_to_keep:
+            negative_samples = random.sample(negative_samples, num_negative_to_keep)
+            
+        self.slice_data = positive_samples + negative_samples
+        random.shuffle(self.slice_data) # Shuffle the combined list
+        
+        print(f"Slice map created. Found {num_positive} positive slices and {len(negative_samples)} negative slices.")
+        print(f"Total samples for classifier: {len(self.slice_data)}")
+
+
+    def __len__(self):
+        return len(self.slice_data)
+
+    def _preprocess_raovseg(self, img_np):
+        o1, o2 = 0.22, 0.3
+        p1, p99 = np.percentile(img_np, 1), np.percentile(img_np, 99)
+        img_clipped = np.clip(img_np, p1, p99)
+        min_val, max_val = img_clipped.min(), img_clipped.max()
+        img_norm = (img_clipped - min_val) / (max_val - min_val) if max_val > min_val else img_clipped
+        
+        # This intensity mapping logic seems complex and might be better simplified or verified.
+        # For now, keeping as is.
+        img_enhanced = img_norm.copy()
+        mask_between = (img_norm >= o1) & (img_norm < o2)
+        mask_gt_05 = img_norm > 0.5
+        img_enhanced[mask_between] = 1.0
+        # The logic below seems to be overridden by the last line. Let's simplify.
+        # This logic in the original file was a bit confusing. Let's stick to the paper's description.
+        # The paper says: intensity is set to 1 if within [o1, o2), inverted if > 0.5, and maintained otherwise.
+        # This implies an order. Let's re-implement carefully.
+        
+        final_img = img_norm.copy()
+        # Invert high intensities first
+        final_img[mask_gt_05] = 1.0 - img_norm[mask_gt_05]
+        # Then highlight the ovary range
+        final_img[mask_between] = 1.0
+        
+        return final_img
+
+
+    def __getitem__(self, idx):
+        slice_info = self.slice_data[idx]
+        
+        mri_image = sitk.ReadImage(slice_info['mri_path'], sitk.sitkFloat32)
+        mri_slice = sitk.GetArrayFromImage(mri_image)[slice_info['slice_index'], :, :]
+        
+        mri_slice = self._preprocess_raovseg(mri_slice)
+        
+        image_tensor = torch.from_numpy(mri_slice).unsqueeze(0).float()
+        image_tensor = self.image_transform(image_tensor)
+        
+        if self.augment:
+            image_tensor = self.augmentation_transform(image_tensor)
+        
+        label = torch.tensor(slice_info['label'], dtype=torch.float32)
+            
+        return image_tensor, label
