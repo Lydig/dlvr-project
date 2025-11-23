@@ -5,6 +5,9 @@
 # Archive
 /archive/
 
+# Temp
+/temp/
+
 # Environment
 /dlvr-project/
 /env/
