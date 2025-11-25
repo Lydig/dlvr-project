@@ -1,0 +1,43 @@
+Report
+
+    You must submit a written report of your project.
+    Please use the official arXiv template for your report.
+    Your report should be structured like a research paper:
+        Abstract
+        Introduction (Includes motivation and objectives of your project. Be realistic and be specific!)
+        Related work (Summarize at least 2-3 key references and discuss how they relate to your project)
+        Methods (What did you do and how? Describe network architecture, data set, experiments, etc.)
+        Results (Objectively summarize your results and compare to your baseline model and/or the papers covered in your related work section)
+        Discussion (How well did you do? What worked? What didn’t work?)
+    The final report must be 6-8 pages, including figures and references. Stay within the limits, and avoid placing excessive material in an appendix, as it will not be read.
+    Upload the report to Brightspace no later than December 5.
+
+You must also submit the following (see details below):
+
+    A contribution statement (December 5)
+    A 5-minute video presentation (December 12)
+    Your source code (December 5)
+
+Contribution Statement
+
+    All groups must submit a separate document describing the contribution of each group member.
+    Provide 1–3 sentences per person describing what they contributed (e.g., model implementation, experiments, data preparation, literature review, reporting, etc.).
+    The document should reflect the actual distribution of work - not an idealized or equal distribution.
+    Submit the document to Brightspace no later than December 5.
+    Note: This document is used for transparency and fairness. It does not affect your grade directly unless there are issues of unequal participation.
+
+Video recording
+
+    You must submit a 5-minute video where you present your project.
+    Use slides if you wish, but it is perfectly acceptable to simply scroll through your report while explaining your work.
+    You may upload the video directly to Brightspace or provide a link (e.g., YouTube).
+    The video is the only file that may be submitted after December 5 (deadline: December 12).
+    If you submit the video recording after December 5, make a re-submission on Brightspace and ignore any warning messages.
+
+Code
+
+    You must submit your project’s source code to document that you carried out the work yourselves.
+    A GitHub link or Google Colab notebook is fine, but you may also upload a ZIP file.
+    If possible, include code to download your dataset. Otherwise, provide a link to the original data source.
+    Do not upload datasets to Brightspace.
+    You must submit/share your code no later than December 5.
