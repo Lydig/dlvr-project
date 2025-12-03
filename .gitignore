@@ -9,6 +9,10 @@
 /temp/
 /temp2/
 
+/for-llm/
+
+/figures/
+
 # Environment
 /dlvr-project/
 /env/
